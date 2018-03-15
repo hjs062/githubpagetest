@@ -25,12 +25,18 @@
     </style>
 </head>
 
+<script src="proj4.js"></script>
+
 <body>
+    <script>;
+        var googlemap;
+        var vworldmap;
+    </script>
+
     <div class="split left">
-        <div id="idgooglemap" style="width:100%;height:100%" />
+        <div id="idgooglemap" style="width:100%;height:100%" onmousemove="funcForMouseMove0(event)" />
 
         <script>
-            var googlemap;
             function initgooglemap() {
                 var mapProp =
                     {
@@ -40,6 +46,13 @@
                         zoom: 17,
                     };
                 googlemap = new google.maps.Map(document.getElementById("idgooglemap"), mapProp);
+            }
+
+            function funcForMouseMove0(e) {
+                var c = googlemap.getCenter();
+                var src = new proj4.Point(c.lng(), c.lat());
+                var dst = proj4(proj4('EPSG:3857'), src);
+                vworldmap.setCenterXY(dst.x, dst.y);
             }
         </script>
 
@@ -54,16 +67,18 @@
         <script type="text/javascript" src="http://map.vworld.kr/js/vworldMapInit.js.do?apiKey=8D633000-7DB6-39FE-B1D9-0AEA47F0B9E3&domain=http://localhost:8080"></script>
 
         <script type="text/javascript">
-            var apiMap;
             vworld.showMode = true;
             vworld.init("idvworldmap", "raster-first",
                 function () {
-                    apiMap = this.vmap;
-                    apiMap.setBaseLayer(apiMap.vworldBaseMap);
-                    apiMap.setControlsType({ "simpleMap": true });
-                    apiMap.addVWORLDControl("zoomBar");
+                    var src = new proj4.Point(126.975, 37.585);
+                    var dst = proj4(proj4('EPSG:3857'), src);
+
+                    vworldmap = this.vmap;
+                    vworldmap.setBaseLayer(vworldmap.vworldBaseMap);
+                    vworldmap.setControlsType({ "simpleMap": true });
+                    vworldmap.addVWORLDControl("zoomBar");
                     // EPSG:3857
-                    apiMap.setCenterAndZoom(14134792.34, 4520964.98, 17);
+                    vworldmap.setCenterAndZoom(dst.x, dst.y, 17);
                 }
             );
         </script>
